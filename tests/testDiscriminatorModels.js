@@ -4,8 +4,8 @@
 var Validator = require('../lib/modelValidator');
 var validator = new Validator();
 
-module.exports.refTests = {
-    hasRefWithDefinitionPrefixTest: function(test) {
+module.exports.discriminatorTests = {
+    simpleDiscriminatorTest: function(test) {
         var data = {
             sample: true,
             location: {
@@ -51,13 +51,75 @@ module.exports.refTests = {
             }
         };
 
-        var swagger = {
-            allModels: models
+        var errors = validator.validate(data, models.firstModel, models);
+
+        test.expect(1);
+        test.ok(errors.valid);
+        test.done();
+    },
+
+    nestedDiscriminatorTest: function (test) {
+        var data = {
+            items: [
+                {
+                    type: "subModel1",
+                    top: 1,
+                    left: 1
+                },
+                {
+                    type: "subModel2",
+                    right: 1,
+                    bottom: 1
+                }
+            ]
         };
 
-        var testValidator = new Validator(swagger);
+        var models = {
+            firstModel: {
+                required: [ "items" ],
+                properties: {
+                    items: {
+                        type: "array",
+                        items: {
+                            $ref: "#/definitions/baseModel"
+                        }
+                    }
+                }
+            },
+            baseModel: {
+                required: [ "type" ],
+                properties: {
+                    type: {
+                        type: "string"
+                    }
+                },
+                discriminator: 'type'
+            },
+            subModel1: {
+                required: [ "top", "left" ],
+                properties: {
+                    top: {
+                        type: "integer"
+                    },
+                    left: {
+                        type: "integer"
+                    }
+                }
+            },
+            subModel2: {
+                required: [ "right", "bottom" ],
+                properties: {
+                    right: {
+                        type: "integer"
+                    },
+                    bottom: {
+                        type: "integer"
+                    }
+                }
+            }
+        };
 
-        var errors = swagger.validateModel("firstModel", data);
+        var errors = validator.validate(data, models.firstModel, models);
 
         test.expect(1);
         test.ok(errors.valid);
