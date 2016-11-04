@@ -67,7 +67,7 @@ module.exports.validationTests = {
 
         test.expect(2);
         test.ok(!errors.valid);
-        test.ok(errors.errors[0].message === 'id is a required field');
+        test.ok(errors.errors[0].message === 'id ({empty string}) is not a type of integer');
 
         test.done();
     },
