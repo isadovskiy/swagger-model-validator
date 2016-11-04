@@ -5,7 +5,7 @@ var Validator = require('../lib/modelValidator');
 var validator = new Validator();
 
 module.exports.discriminatorTests = {
-    simpleDiscriminatorTest: function(test) {
+    simpleDiscriminatorTest: function (test) {
         var data = {
             sample: true,
             location: {
@@ -22,7 +22,7 @@ module.exports.discriminatorTests = {
                 discriminator: "type"
             },
             dataModel: {
-                required: [ "sample" ],
+                required: ["sample"],
                 properties: {
                     sample: {
                         type: "boolean"
@@ -33,7 +33,7 @@ module.exports.discriminatorTests = {
                 }
             },
             Location: {
-                required: [ "top", "left" ],
+                required: ["top", "left"],
                 properties: {
                     top: {
                         type: "integer"
@@ -76,7 +76,7 @@ module.exports.discriminatorTests = {
 
         var models = {
             firstModel: {
-                required: [ "items" ],
+                required: ["items"],
                 properties: {
                     items: {
                         type: "array",
@@ -87,7 +87,7 @@ module.exports.discriminatorTests = {
                 }
             },
             baseModel: {
-                required: [ "type" ],
+                required: ["type"],
                 properties: {
                     type: {
                         type: "string"
@@ -96,30 +96,44 @@ module.exports.discriminatorTests = {
                 discriminator: 'type'
             },
             subModel1: {
-                required: [ "top", "left" ],
-                properties: {
-                    top: {
-                        type: "integer"
+                allOf: [
+                    {
+                        $ref: "#/definitions/baseModel"
                     },
-                    left: {
-                        type: "integer"
+                    {
+                        required: ["top", "left"],
+                        properties: {
+                            top: {
+                                type: "integer"
+                            },
+                            left: {
+                                type: "integer"
+                            }
+                        }
                     }
-                }
+                ]
             },
             subModel2: {
-                required: [ "right", "bottom" ],
-                properties: {
-                    right: {
-                        type: "integer"
+                allOf: [
+                    {
+                        $ref: "#/definitions/baseModel"
                     },
-                    bottom: {
-                        type: "integer"
+                    {
+                        required: ["right", "bottom"],
+                        properties: {
+                            right: {
+                                type: "integer"
+                            },
+                            bottom: {
+                                type: "integer"
+                            }
+                        }
                     }
-                }
+                ]
             }
         };
 
-        var errors = validator.validate(data, models.firstModel, models);
+        var errors = validator.validate(data, models.firstModel, models, false, true);
 
         test.expect(1);
         test.ok(errors.valid);
